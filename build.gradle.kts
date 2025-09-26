@@ -1,5 +1,20 @@
 plugins {
     id("java")
+    id("application")
+}
+
+application {
+    mainClass.set("br.com.zef.application.Main")
+}
+
+tasks.withType<JavaExec> {
+    standardInput = System.`in`
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "br.com.zef.application.Main"
+    }
 }
 
 configurations {

@@ -1,4 +1,4 @@
-package br.com.zef;
+package br.com.zef.application;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
@@ -8,13 +8,13 @@ import java.util.Scanner;
 import br.com.zef.exception.AccountNotFoundException;
 import br.com.zef.exception.NoFundsEnoughException;
 import br.com.zef.exception.WalletNotFoundException;
-import br.com.zef.repository.AccountRepository;
-import br.com.zef.repository.InvestmentRepository;
+import br.com.zef.service.AccountService;
+import br.com.zef.service.InvestmentService;
 
 public class Main {
 
-    private final static AccountRepository accountRepository = new AccountRepository();
-    private final static InvestmentRepository investmentRepository = new InvestmentRepository();
+    private final static AccountService accountService = new AccountService();
+    private final static InvestmentService investmentService = new InvestmentService();
 
     static Scanner scan = new Scanner(System.in);
 
@@ -46,11 +46,11 @@ public class Main {
                 case 6 -> transferToAccount();
                 case 7 -> incInvestment();
                 case 8 -> rescueInvestment();
-                case 9 -> accountRepository.list().forEach(System.out::println);
-                case 10 -> investmentRepository.list().forEach(System.out::println);
-                case 11 -> investmentRepository.listWallets().forEach(System.out::println);
+                case 9 -> accountService.listAccounts().forEach(System.out::println);
+                case 10 -> investmentService.listInvestments().forEach(System.out::println);
+                case 11 -> investmentService.listInvestmentWallets().forEach(System.out::println);
                 case 12 -> {
-                    investmentRepository.updateAmount();
+                    investmentService.updateInvestments();
                     System.out.println("Investimentos reajustados");
                 }
                 case 13 -> checkHistory();
@@ -58,7 +58,6 @@ public class Main {
                 default -> System.out.println("Opção inválida");
             }
 
-            scan.close();
         }
     }
 
@@ -67,7 +66,7 @@ public class Main {
         var pix = Arrays.stream(scan.next().split(";")).toList();
         System.out.println("Informe o valor inicial de deposito");
         var amount = scan.nextLong();
-        var wallet = accountRepository.create(pix, amount);
+        var wallet = accountService.createAccount(pix, amount);
         System.out.println("Conta criada: " + wallet);
     }
 
@@ -76,7 +75,7 @@ public class Main {
         var tax = scan.nextInt();
         System.out.println("Informe o valor inicial de deposito");
         var initialFunds = scan.nextLong();
-        var investment = investmentRepository.create(tax, initialFunds);
+        var investment = investmentService.createInvestment(tax, initialFunds);
         System.out.println("Investimento criado: " + investment);
     }
 
@@ -86,7 +85,7 @@ public class Main {
         System.out.println("Informe o valor que será sacado: ");
         var amount = scan.nextLong();
         try {
-            accountRepository.withdraw(pix, amount);
+            accountService.withdraw(pix, amount);
         } catch (NoFundsEnoughException | AccountNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -98,7 +97,7 @@ public class Main {
         System.out.println("Informe o valor que será depositado: ");
         var amount = scan.nextLong();
         try {
-            accountRepository.deposit(pix, amount);
+            accountService.deposit(pix, amount);
         } catch (AccountNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -112,7 +111,7 @@ public class Main {
         System.out.println("Informe o valor que será transferido: ");
         var amount = scan.nextLong();
         try {
-            accountRepository.transferMoney(source, target, amount);
+            accountService.transferToAccount(source, target, amount);
         } catch (AccountNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -121,20 +120,19 @@ public class Main {
     private static void createWalletInvestment() {
         System.out.println("Informe a chave pix da conta: ");
         var pix = scan.next();
-        var account = accountRepository.findByPix(pix);
         System.out.println("Informe o identificador do investimento: ");
         var investmentId = scan.nextInt();
-        var investmentWallet = investmentRepository.initInvestment(account, investmentId);
+        var investmentWallet = investmentService.createWalletInvestment(pix, investmentId);
         System.out.println("Conta de investimento criada: " + investmentWallet);
     }
 
     private static void incInvestment() {
         System.out.println("Informe a chave pix da conta para investimento: ");
         var pix = scan.next();
-        System.out.println("Informe o valor que será investido: ");
+        System.out.println("Informe o valor a ser investido: ");
         var amount = scan.nextLong();
         try {
-            investmentRepository.deposit(pix, amount);
+            investmentService.incInvestment(pix, amount);
         } catch (WalletNotFoundException | AccountNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -146,7 +144,7 @@ public class Main {
         System.out.println("Informe o valor que será sacado: ");
         var amount = scan.nextLong();
         try {
-            investmentRepository.withdraw(pix, amount);
+            investmentService.rescueInvestment(pix, amount);
         } catch (NoFundsEnoughException | AccountNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -156,7 +154,7 @@ public class Main {
         System.out.println("Informe a chave pix da conta para verificar extrato:");
         var pix = scan.next();
         try {
-            var sortedHistory = accountRepository.getHistory(pix);
+            var sortedHistory = accountService.getHistory(pix);
             sortedHistory.forEach((k, v) -> {
                 System.out.println(k.format(ISO_DATE_TIME));
                 System.out.println(v.get(0).transactionId());
