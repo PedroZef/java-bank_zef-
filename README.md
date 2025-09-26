@@ -1,6 +1,6 @@
 # Aplicativo Simples de Operações Bancárias - aplicando Java com Orientação a Objetos
 
-## Esse projeto foi desenvolvido no desafio de projeto de Programação Orientada a Objetos no Bootcamp Java e IA para iniciantes, da DIO e NTT Data. O projeto consiste em uma aplicação de console que permite o cadastro de contas bancárias e a realização de operações bancárias básicas, como depósito, saque, transferência, investimento e visualização do histórico de transações.
+## Esse projeto foi desenvolvido no desafio de projeto de Programação Orientada a Objetos no Bootcamp Java para iniciantes, da DIO e o Riachuelo - Primeiros Passos com Java. O projeto consiste em uma aplicação de console que permite o cadastro de contas bancárias e a realização de operações bancárias básicas, como depósito, saque, transferência, investimento e visualização do histórico de transações.
 
 ## Ferramentas e Tecnologias
 
