@@ -77,4 +77,8 @@ public class InvestmentRepository {
         return this.investments;
     }
 
+    public boolean hasInvestment(final AccountWallet account) {
+        return wallets.stream().anyMatch(w -> w.getAccount().equals(account));
+    }
+
 }

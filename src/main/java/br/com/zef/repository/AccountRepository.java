@@ -70,4 +70,8 @@ public class AccountRepository {
                 .collect(Collectors.groupingBy(t -> t.createdAt().truncatedTo(SECONDS)));
     }
 
+    public void delete(final AccountWallet account) {
+        accounts.remove(account);
+    }
+
 }
