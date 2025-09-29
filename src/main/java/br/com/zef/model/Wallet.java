@@ -36,16 +36,21 @@ public abstract class Wallet {
     }
 
     public List<Money> reduceMoney(final long amount) {
-        List<Money> toRemove = new ArrayList<>();
-        for (int i = 0; i < amount; i++) {
-            toRemove.add(this.money.remove(0));
-        }
+        int amountToRemove = (int) amount;
+        List<Money> toRemove = new ArrayList<>(money.subList(0, amountToRemove));
+        money.subList(0, amountToRemove).clear();
         return toRemove;
     }
 
     public List<MoneyAudit> getFinancialTransactions() {
         return money.stream().flatMap(m -> m.getHistory().stream()).toList();
     }
+
+    public void reduceFunds(final long amount) {
+        int amountToRemove = (int) amount;
+        money.subList(0, amountToRemove).clear();
+    }
+
 
     @Override
     public String toString() {

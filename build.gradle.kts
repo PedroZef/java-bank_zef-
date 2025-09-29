@@ -9,6 +9,7 @@ application {
 
 tasks.withType<JavaExec> {
     standardInput = System.`in`
+    jvmArgs = listOf("-Dfile.encoding=UTF-8")
 }
 
 tasks.jar {

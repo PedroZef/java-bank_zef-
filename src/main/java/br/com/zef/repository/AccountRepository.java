@@ -37,11 +37,11 @@ public class AccountRepository {
         target.addMoney(fundsAmount, "depósito");
     }
 
-    public long withdraw(final String pix, final long amount){
+    public AccountWallet withdraw(final String pix, final long amount){
         var source  = findByPix(pix);
         checkFundsForTransaction(source, amount);
-        source.reduceMoney(amount);
-        return amount;
+        source.reduceFunds(amount);
+        return source;
     }
 
     public void transferMoney(final String sourcePix, final String targetPix, final long amount){

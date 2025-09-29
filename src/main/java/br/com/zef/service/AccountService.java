@@ -21,8 +21,8 @@ public class AccountService {
         return accountRepository.create(pix, amount);
     }
 
-    public void withdraw(String pix, long amount) throws NoFundsEnoughException, AccountNotFoundException {
-        accountRepository.withdraw(pix, amount);
+    public AccountWallet withdraw(String pix, long amount) throws NoFundsEnoughException, AccountNotFoundException {
+        return accountRepository.withdraw(pix, amount);
     }
 
     public void deposit(String pix, long amount) throws AccountNotFoundException {

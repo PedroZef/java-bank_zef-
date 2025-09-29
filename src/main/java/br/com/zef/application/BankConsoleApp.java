@@ -7,8 +7,9 @@ import br.com.zef.exception.WalletNotFoundException;
 import br.com.zef.service.AccountService;
 import br.com.zef.service.InvestmentService;
 
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -20,9 +21,10 @@ public class BankConsoleApp {
     private final Scanner scan;
 
     public BankConsoleApp() {
+        System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
         this.accountService = new AccountService();
         this.investmentService = new InvestmentService();
-        this.scan = new Scanner(System.in);
+        this.scan = new Scanner(System.in, java.nio.charset.StandardCharsets.UTF_8);
     }
 
     public void run() {
@@ -53,15 +55,12 @@ public class BankConsoleApp {
     }
 
     private int getUserOption() {
+        System.out.print("Opção: ");
         try {
-            System.out.print("Opção: ");
-            int option = scan.nextInt();
-            scan.nextLine(); // Consome a quebra de linha pendente
-            return option;
-        } catch (InputMismatchException e) {
+            return Integer.parseInt(scan.nextLine());
+        } catch (NumberFormatException e) {
             System.out.println("Entrada inválida. Por favor, digite um número.");
-            scan.nextLine(); // Consome a entrada inválida para evitar loop infinito
-            return -1; // Retorna uma opção inválida para reexibir o menu
+            return -1;
         }
     }
 
@@ -149,9 +148,10 @@ public class BankConsoleApp {
             return;
 
         try {
-            accountService.withdraw(pix, amount);
+            var wallet = accountService.withdraw(pix, amount);
             System.out.println("Saque de R$" + String.format("%.2f", (double) amount / 100.0)
                     + " realizado com sucesso da conta " + pix + ".");
+            System.out.println("Saldo restante: R$" + String.format("%.2f", (double) wallet.getFunds() / 100.0));
         } catch (NoFundsEnoughException | AccountNotFoundException ex) {
             System.out.println("Erro ao sacar: " + ex.getMessage());
         }
@@ -165,6 +165,11 @@ public class BankConsoleApp {
         var amount = getLongInput();
         if (amount == -1)
             return;
+
+        if (amount <= 0) {
+            System.out.println("O valor do depósito deve ser maior que zero.");
+            return;
+        }
 
         try {
             accountService.deposit(pix, amount);
@@ -278,26 +283,21 @@ public class BankConsoleApp {
     // Método auxiliar para obter entrada de inteiro com tratamento de erro
     private int getIntInput() {
         try {
-            int value = scan.nextInt();
-            scan.nextLine(); // Consome a quebra de linha
-            return value;
-        } catch (InputMismatchException e) {
+            return Integer.parseInt(scan.nextLine());
+        } catch (
+
+        NumberFormatException e) {
             System.out.println("Entrada inválida. Por favor, digite um número inteiro.");
-            scan.nextLine(); // Consome a entrada inválida
-            return -1; // Indica erro
+            return -1;
         }
     }
 
-    // Método auxiliar para obter entrada de long com tratamento de erro
     private long getLongInput() {
         try {
-            long value = scan.nextLong();
-            scan.nextLine(); // Consome a quebra de linha
-            return value;
-        } catch (InputMismatchException e) {
-            System.out.println("Entrada inválida. Por favor, digite um número inteiro longo.");
-            scan.nextLine(); // Consome a entrada inválida
-            return -1; // Indica erro
+            return Long.parseLong(scan.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida. Por favor, digite um número inteiro.");
+            return -1;
         }
     }
 }
